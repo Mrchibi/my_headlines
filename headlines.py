@@ -6,13 +6,25 @@ from flask import  Flask
 
 app = Flask(__name__)#创建程序实例，该实例为flask类的对象，
 #wsgi协议把接收到的请求转交给这个对象处理
-ZHIHU_FEED ="https://www.zhihu.com/rss"#知乎RSS地址
+RSS_FEED = {"zhihu": "https://www.zhihu.com/rss",
+            "netease": "http://news.163.com/special/00011K6L/rss_newsattitude.xml",
+            "songshuhui": "http://songshuhui.net/feed",
+            "ifeng": "http://news.ifeng.com/rss/index.xml"}#RSS字典
 
 
 
-@app.route('/')#声明路由
-def get_news():
-    feed = feedparser.parse(ZHIHU_FEED)#parse函数解析rss
+
+@app.route('/')
+@app.route('/zhihu')
+def zhihu():
+    return get_news('zhihu')
+
+@app.route('/netease')
+def netease():
+    return get_news('netease')
+
+def get_news(publication):
+    feed = feedparser.parse(RSS_FEED[publication])#parse函数解析rss
     first_content = feed['entries'][0]
     html_format="""
     <html> <body>
