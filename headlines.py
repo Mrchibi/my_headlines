@@ -23,11 +23,8 @@ def get_news(publication="zhihu"):
     feed = feedparser.parse(RSS_FEED[publication])#parse函数解析rss
     first_content = feed['entries'][0]
     
-    entry = dict(title=first_content.get('title'),
-                 published=first_content.get('published'),
-                 summary=first_content.get('summary')
-                 )
-    return render_template('home.html',**entry)
+    
+    return render_template('home.html',article=first_content)
     
 if __name__=='__main__':
     app.run(host='0.0.0.0',port=5000,debug=True)#执行该脚本时才启动程序
