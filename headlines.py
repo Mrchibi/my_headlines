@@ -16,10 +16,10 @@ RSS_FEED = {"zhihu": "https://www.zhihu.com/rss",
 
 
 
-@app.route('/')#执行的视图函数
+@app.route('/',methods=['GET','POST'])#执行的视图函数
 
 
-def get_news(publication="zhihu"):
+def get_news():
     query = request.args.get("publication")
     if not query or query.lower() not in RSS_FEED:
         publication = "songshuhui"
