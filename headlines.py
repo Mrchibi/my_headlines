@@ -3,7 +3,8 @@
 from __future__ import  unicode_literals
 import requests
 import feedparser
-from flask import  Flask,render_template,request
+from flask import  Flask,render_template,request,make_response
+import datetime
 
 app = Flask(__name__)#创建程序实例，该实例为flask类的对象，
 #wsgi协议把接收到的请求转交给这个对象处理
@@ -18,22 +19,33 @@ WEATHERS = {"北京":101010100,
             "上海":101020100,
             "广州":101280101,
             "深圳":101280601}
+DEFAULTS ={'city':'北京',
+           'publication':'songshuhui'}
 
 
 
+def get_value_with_fallback(key):
+    if request.args.get(key):
+        return request.args.get(key)
+    if request.cookies.get(key):
+        return request.cookies.get(key)
+    return DEFAULTS[key]
 @app.route('/')#执行的视图函数
 def home():
-    query = request.args.get("publication")
-    if not query or query.lower() not in RSS_FEED:
-        publication = "songshuhui"
-    else:
-        publication = query.lower()
-    
-    city = request.args.get('city','北京')
+    publication = get_value_with_fallback('publication')
+    city =get_value_with_fallback('city')
+
     weather = get_weather(city)
     articles = get_news(publication)
     
-    return render_template('home.html',articles=articles,weather=weather)
+    response = make_response(render_template('home.html',articles=articles,weather=weather))
+    
+    expires = datetime.datetime.now()+datetime.timedelta(days=365)
+    response.set_cookie('publication',publication,expires=expires)
+    response.set_cookie('city',city,expires=expires)
+    return response
+
+
 def get_news(publication):
     feed = feedparser.parse(RSS_FEED[publication])#parse函数解析rss
     return feed['entries']#feed['entries']表示一组文章的条目
