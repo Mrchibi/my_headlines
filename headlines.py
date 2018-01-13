@@ -9,19 +9,15 @@ app = Flask(__name__)#创建程序实例，该实例为flask类的对象，
 RSS_FEED = {"zhihu": "https://www.zhihu.com/rss",
             "netease": "http://news.163.com/special/00011K6L/rss_newsattitude.xml",
             "songshuhui": "http://songshuhui.net/feed",
-            "ifeng": "http://news.ifeng.com/rss/index.xml"}#RSS字典
+            "ifeng": "http://news.ifeng.com/rss/index.xml",
+            
+            }#RSS字典
 
 
 
 
-@app.route('/')
-@app.route('/zhihu')
-def zhihu():
-    return get_news('zhihu')
-
-@app.route('/netease')
-def netease():
-    return get_news('netease')
+@app.route('/')#执行与/<publication>一样的视图函数
+@app.route('/<publication>')#使用动态路由获取不同网站的headlines
 
 def get_news(publication):
     feed = feedparser.parse(RSS_FEED[publication])#parse函数解析rss
